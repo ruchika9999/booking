@@ -1,14 +1,16 @@
 "use client";
 import { useCallback, useState } from "react";
 import { AiOutlineMenu } from "react-icons/ai";
-import useRegisterModal from "@/app/hooks/useRegisterModal";
 
-import Profile from "../../Profile";
+import Profile from "../../common/Profile";
 import MenuItem from "../MenuItem";
+import useLoginModal from "@/app/hooks/useLoginModal";
+import useRegisterModal from "@/app/hooks/useRegisterModal";
 
 const USerMenu = () => {
   const [isOpen, setStatus] = useState(false);
   const registerModal = useRegisterModal();
+  const loginModal = useLoginModal();
 
   const handleOpen = useCallback(() => {
     setStatus((state) => !state);
@@ -36,8 +38,8 @@ const USerMenu = () => {
       {isOpen && (
         <div className="absolute rounded-xl shadow-md w-[40vw] md:w-3/4 bg-white overflow-hidden right-0 top-12 text-sm">
           <div className="flex flex-col cursor-pointer p-5">
-            <MenuItem label="Login" onClick={registerModal.onOpen} />
-            <MenuItem label="Sign up"  onClick={registerModal.onOpen}/>
+            <MenuItem label="Login" onClick={loginModal.onOpen} />
+            <MenuItem label="Sign up" onClick={registerModal.onOpen} />
           </div>
         </div>
       )}

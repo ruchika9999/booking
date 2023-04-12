@@ -1,4 +1,6 @@
 import { z } from "zod";
-import { registerFrom } from "./helper";
+import { loginFrom, registerFrom } from "./helper";
 
 export type RegisterFormType = z.infer<typeof registerFrom>;
+
+export type LoginFormType = z.infer<typeof loginFrom>;

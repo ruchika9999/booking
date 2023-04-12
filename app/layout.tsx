@@ -2,6 +2,7 @@ import { Montserrat } from "next/font/google";
 import NavigationBar from "./components/NavigationBar";
 import RegisterModal from "./components/Modals/RegisterModal";
 import "./globals.css";
+import LoginModal from "./components/Modals/LoginModal";
 
 export const metadata = {
   title: "Next.js + TypeScript + Tailwind CSS",
@@ -22,6 +23,7 @@ const RootLayout = (props: Props) => {
       <body className={font.className}>
         <RegisterModal />
         <NavigationBar />
+        <LoginModal/>
         {children}
       </body>
     </html>

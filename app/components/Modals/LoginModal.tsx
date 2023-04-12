@@ -1,7 +1,7 @@
 "use client";
-
+import { signIn } from "next-auth/react";
 import { useState } from "react";
-import axios from "axios";
+import { useRouter } from "next/navigation";
 import {
   FormProvider,
   SubmitErrorHandler,
@@ -16,59 +16,55 @@ import Heading from "../common/Heading";
 import TextInput from "../common/Input/TextInput";
 import Modal from "../common/Modal";
 
-import useRegisterModal from "@/app/hooks/useRegisterModal";
 import useLoginModal from "@/app/hooks/useLoginModal";
+import useRegisterModal from "@/app/hooks/useRegisterModal";
 
 import { ConstField } from "@/app/constant/index";
-import { getRegisterFrom } from "@/app/helper";
-import { RegisterFormType } from "@/app/types";
+import { getLoginFrom } from "@/app/helper";
+import { LoginFormType } from "@/app/types";
 
-const RegisterModal = () => {
-  const registerModal = useRegisterModal();
+const LoginModal = () => {
   const loginModal = useLoginModal();
-
+  const router = useRouter();
+  const registerModal = useRegisterModal();
   const [isLoading, setIsLoading] = useState(false);
 
   const onToggle = () => {
-    if (registerModal.isOpen) {
-      registerModal.onClose();
-      loginModal.onOpen();
+    if (loginModal.isOpen) {
+      loginModal.onClose();
+      registerModal.onOpen();
     }
   };
 
-  const useFormMethods = useForm<RegisterFormType>({
+  const useFormMethods = useForm<LoginFormType>({
     mode: "onBlur",
     reValidateMode: "onChange",
-    defaultValues: getRegisterFrom(),
+    defaultValues: getLoginFrom(),
     resolver: undefined,
   });
 
   const { handleSubmit } = useFormMethods;
 
-  const onSubmit: SubmitHandler<RegisterFormType> = (values) => {
+  const onSubmit: SubmitHandler<LoginFormType> = (values) => {
     setIsLoading(true);
-    axios
-      .post("/api/register", values)
-      .then((res) => {
-        setIsLoading(false);
-        registerModal.onClose();
-      })
-      .catch((err) => {
-        setIsLoading(false);
-        console.log(err);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+    signIn("credentials", { ...values, redirect: false }).then((callBack) => {
+      setIsLoading(false);
+      if (callBack?.ok) {
+        router.refresh();
+        loginModal.onClose();
+      }
+      if (callBack?.error) {
+        console.log(callBack.error);
+      }
+    });
   };
 
-  const onError: SubmitErrorHandler<RegisterFormType> = (values) => {};
+  const onError: SubmitErrorHandler<LoginFormType> = (values) => {};
   const bodyContent = (
     <div className="flex flex-col gap-4">
       <Heading title="Welcome to Airbnb" />
       <TextInput errors={false} label={ConstField.EMAIL} type="text" />
       <TextInput errors={false} label={ConstField.PASSWORD} type="password" />
-      <TextInput errors={false} label={ConstField.NAME} type="text" />
     </div>
   );
 
@@ -105,7 +101,7 @@ const RegisterModal = () => {
               hover:underline
             "
           >
-            Log in
+            Register
           </span>
         </p>
       </div>
@@ -116,10 +112,10 @@ const RegisterModal = () => {
     <FormProvider {...useFormMethods}>
       <Modal
         disabled={isLoading}
-        isOpen={registerModal.isOpen}
-        title="Register"
+        isOpen={loginModal.isOpen}
+        title="Login"
         actionLabel="Continue"
-        onClose={registerModal.onClose}
+        onClose={loginModal.onClose}
         onSubmit={handleSubmit(onSubmit, onError)}
         body={bodyContent}
         footer={footerContent}
@@ -128,4 +124,4 @@ const RegisterModal = () => {
   );
 };
 
-export default RegisterModal;
+export default LoginModal;
